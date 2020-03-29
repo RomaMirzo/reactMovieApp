@@ -3,6 +3,7 @@ import React from "react";
 import MovieItem from "./MovieItem";
 import { API_URL, API_KEY_3 } from "../utils/api";
 import MovieTabs from "../components/MovieTabs";
+import Pagination from "../components/Pagination";
 // UI = fn(state, props)
 
 // App = new React.Component()
@@ -14,7 +15,9 @@ class App extends React.Component {
     this.state = {
       movies: [],
       moviesWillWatch: [],
-      sort_by: "popularity.desc"
+      sort_by: "popularity.desc",
+      currentPage: 1,
+      totalPages: 0
     };
   }
 
@@ -23,33 +26,31 @@ class App extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.sort_by !== this.state.sort_by) {
-      this.getMovies();
-    }
+    return (prevState.sort_by !== this.state.sort_by ||
+      prevState.currentPage !== this.state.currentPage
+      ? this.getMovies() : false);
   }
 
   getMovies = () => {
     fetch(
       `${API_URL}/discover/movie?api_key=${API_KEY_3}&sort_by=${
         this.state.sort_by
-      }`
+      }&page=${this.state.currentPage}`
     )
       .then(response => {
         return response.json();
       })
       .then(data => {
         this.setState({
-          movies: data.results
+          movies: data.results,
+          // isLoading: false,
+          totalPages: data.total_pages
         });
       });
   };
 
   deleteMovie = movie => {
-    console.log(movie.id);
     const updateMovies = this.state.movies.filter(item => item.id !== movie.id);
-    console.log(updateMovies);
-
-    // this.state.movies = updateMovies;
     this.setState({
       movies: updateMovies
     });
@@ -76,12 +77,23 @@ class App extends React.Component {
 
   updateSortBy = value => {
     this.setState({
-      sort_by: value
+      sort_by: value,
+      currentPage: 1
     });
   };
 
+  changeCurrentPage = value => {
+    if (value > 0) {
+      this.setState({
+        currentPage: value,
+      });
+    }
+  };
+
   render() {
-    console.log("render", this);
+    if (this.state.isLoading) {
+      return <p>Loading ...</p>;
+    }
     return (
       <div className="container">
         <div className="row mt-4">
@@ -108,7 +120,15 @@ class App extends React.Component {
                 );
               })}
             </div>
+            <div className="row justify-content-center">
+              <Pagination
+                currentPage={this.state.currentPage}
+                totalPages={this.state.totalPages}
+                changeCurrentPage={this.changeCurrentPage}
+              />
+            </div>
           </div>
+          
           <div className="col-3">
             <h4>Will Watch: {this.state.moviesWillWatch.length} movies</h4>
             <ul className="list-group">
