@@ -12,7 +12,7 @@ class MovieTabs extends React.Component {
     };
 
     const getClassLink = value => {
-      return cn('nav-link', {"active" : sort_by === value});
+      return cn('nav-link', {"bg-dark active" : sort_by === value});
       // return `nav-link ${sort_by === value ? "active" : ""}`;
     };
     return (

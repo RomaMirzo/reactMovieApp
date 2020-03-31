@@ -1,4 +1,6 @@
 import React from "react";
+// import ImgDef from "./default-image.png";
+import ImgDef from "../img/defImage.png";
 
 class MovieItem extends React.Component {
   state = {
@@ -17,15 +19,28 @@ class MovieItem extends React.Component {
       <div className="card">
         <img
           className="card-img-top"
-          src={`https://image.tmdb.org/t/p/w500${data.backdrop_path ||
-            data.poster_path}`}
+          src={data.backdrop_path === null || data.poster_path === null ? ImgDef : `https://image.tmdb.org/t/p/w500${data.backdrop_path ||
+          data.poster_path}`}
+          // src={`https://image.tmdb.org/t/p/w500${data.backdrop_path ||
+          //   data.poster_path}`}
           alt=""
         />
         <div className="card-body">
           <h6 className="card-title">{data.title}</h6>
           <div className="d-flex justify-content-between align-items-center">
             <p className="mb-0">Rating: {data.vote_average}</p>
-            {this.state.willWatch ? (
+          </div>
+          <div className="d-flex justify-content-between mt-1">
+          <button
+          className="btn btn-warning"
+            type="button"
+            onClick={() => {
+              deleteMovie(data);
+            }}
+          >
+            Delete
+          </button>
+          {this.state.willWatch ? (
               <button
                 type="button"
                 className="btn btn-success"
@@ -53,14 +68,6 @@ class MovieItem extends React.Component {
               </button>
               )}
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              deleteMovie(data);
-            }}
-          >
-            Delete
-          </button>
         </div>
       </div>
     );
